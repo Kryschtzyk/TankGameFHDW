@@ -3,9 +3,31 @@ const startScreen = document.getElementById("start-screen");
 const gameScreen = document.getElementById("game-screen");
 const exitButton = document.getElementById("exit-button");
 const creditButton = document.getElementById("credit-button");
-const closeButton = document.getElementById("close-button");
 const popup = document.getElementById("controls-popup");
 const body = document.querySelector("body");
+const soundButton = document.getElementById("sound-button");
+const backgroundMusic = document.getElementById("background-music");
+const audioState = document.getElementById('background-audio');
+
+const buttonClickSound = new Audio('assets/sounds/buttonSound.mp3');
+const buttons = document.querySelectorAll("button");
+
+const audio = new Audio("assets/sounds/startMenueMusic.mp3");
+let audioPlaying = false;
+
+audio.addEventListener("canplaythrough", () => {
+    backgroundMusic.play();
+});
+
+backgroundMusic.muted = true;
+
+buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+        if (audioPlaying) {
+            buttonClickSound.play();
+        }
+    });
+});
 
 startButton.addEventListener("click", function (){
     startScreen.style.display = "none";
@@ -28,4 +50,24 @@ body.addEventListener("click", (event) => {
     if (event.target.id === "controls-popup") {
         popup.style.display = "none";
     }
+})
+
+soundButton.addEventListener("click", () => {
+    if (audio.paused) {
+        audio.play();
+        audio.loop = true;
+        audioPlaying = true;
+        backgroundMusic.muted = false;
+        soundButton.classList.remove("muted");
+        soundButton.firstElementChild.src = "assets/images/sound-on.png";
+        console.log("Music is playing");
+    } else {
+        audio.pause();
+        audioPlaying = false;
+        backgroundMusic.muted = true;
+        soundButton.classList.add("muted");
+        soundButton.firstElementChild.src = "assets/images/sound-off.png";
+        console.log("Music is muted");
+    }
 });
+
