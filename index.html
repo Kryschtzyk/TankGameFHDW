@@ -2,13 +2,13 @@
 <html lang="DE">
 <head>
     <meta charset="utf-8">
-    <title>Tank Game</title>
+    <title>Tanker.io</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="start-screen">
-    <h1 class="title">Tank Game</h1>
+    <h1 class="title">Tanker</h1>
     <button id="start-button">Play</button>
 </div>
 
@@ -37,10 +37,12 @@
     <div class="footer">
         <button class="footer-button exit-button" id="exit-button"><img class="footer-image" src="assets/images/exit.png" alt="Exit"></button>
         <button class="footer-button" id="settings-button"><img class="footer-image" src="assets/images/settings.png" alt="Settings"></button>
-        <button class="footer-button" id="sound-button"><img class="footer-image" src="assets/images/sound.png" alt="Sound"></button>
+        <button class="footer-button" id="sound-button"><img class="footer-image" src="assets/images/sound-off.png" alt="Sound"></button>
         <button class="footer-button" id="credit-button"><img class="footer-image" src="assets/images/credit.png" alt="Credit"></button>
     </div>
 </footer>
+
+<audio id="background-music" src="assets/sounds/startMenueMusic.mp3"></audio>
 
 <script src="assets/scripts/collision.js"></script>
 <script src="assets/scripts/game.js"></script>
