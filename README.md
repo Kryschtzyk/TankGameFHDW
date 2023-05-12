@@ -7,7 +7,7 @@ This is a web-based game developed as a project for GitHub University. The game 
 To play the game, simply clone the repository and open the `index.html` file in a web browser. 
 
 ```
-git clone https://github.com/yourusername/tank-game.git
+git clone https://github.com/Kryschtzyk/TankGameFHDW.git
 ```
 
 ## Usage
