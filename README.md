@@ -1,6 +1,6 @@
 # Tank Game
 
-This is a web-based game developed as a project for GitHub University. The game is built using HTML, CSS, and JavaScript and is a Tank Game that offers both single-player and multiplayer modes. The single-player mode features different levels that the player can progress through, while the multiplayer mode can be played on a single computer.
+This is a web-based game developed as a project for FHDW Bergisch Gladbach. The game is built using HTML, CSS, and JavaScript and is a Tank Game that offers both single-player and multiplayer modes. The single-player mode features different levels that the player can progress through, while the multiplayer mode can be played on a single computer.
 
 ## Installation
 
