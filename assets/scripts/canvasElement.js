@@ -3,18 +3,7 @@ const ctx = canvas.getContext('2d');
 
 tankImage = new Image();
 tankImage.src = 'assets/images/tank.png';
-// tankImage.onload = gameLoop;
-tankImage.onload = function () {
-    var wrh = tankImage.width / tankImage.height;
-    var newWidth = canvas.width;
-    var newHeight = newWidth / wrh;
-    if (newHeight > canvas.height) {
-        newHeight = canvas.height;
-        newWidth = newHeight * wrh;
-    }
-
-    ctx.drawImage(tankImage, 0, 0, newWidth, newHeight);
-}
+tankImage.onload = gameLoop;
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -27,14 +16,15 @@ resizeCanvas();
 
 let obstacles = [];
 let shots = [];
-let lastShotTime = 0; // initialize lastShotTime to 0
-
+let lastShotTime = 0;
 
 const circleRadius = 2;
 const obstacleMinDistance = 100;
 
 function generateObstacles() {
-    for (let i = 0; i < Math.floor(Math.random() * (20 - 10 + 1) + 10); i++) {
+    let minAmountObstacles = 10;
+    let maxAmountObstacles = 20;
+    for (let i = 0; i < Math.floor(Math.random() * (maxAmountObstacles - minAmountObstacles + 1) + 10); i++) {
         let obstacle = {
             x: 0,
             y: 0,
@@ -75,15 +65,22 @@ function isCloseToCircle(rect, circleRadius, minDistance) {
 
 let x = canvas.width / 2;
 let y = canvas.height / 2;
-let radius = Math.min(canvas.width, canvas.height) / 30;
 
+let radius = Math.min(canvas.width, canvas.height) / 32;
 
 function prepareTankCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawTank() {
-    ctx.drawImage(tankImage, x, y);
+    const tankWidth = tankImage.width;
+    const tankHeight = tankImage.height;
+
+    const centerX = x - tankWidth / 2;
+    const centerY = y - tankHeight / 2;
+
+
+    ctx.drawImage(tankImage, centerX, centerY);
 }
 
 function drawObstacles() {
@@ -136,36 +133,31 @@ function updateTank() {
         }
     }
 
-    x += dx;
-    y += dy;
+    let nextX = x + dx;
+    let nextY = y + dy;
+    let collision = false;
 
     // Check collision with obstacles
     for (let i = 0; i < obstacles.length; i++) {
         let obstacle = obstacles[i];
+        let obstacleCenterX = obstacle.x + obstacle.width / 2;
+        let obstacleCenterY = obstacle.y + obstacle.height / 2;
 
-        // Calculate the distance between the circle center and the closest point on the obstacle
-        let closestX = Math.max(obstacle.x, Math.min(x, obstacle.x + obstacle.width));
-        let closestY = Math.max(obstacle.y, Math.min(y, obstacle.y + obstacle.height));
-        let distanceX = x - closestX;
-        let distanceY = y - closestY;
-        let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        let distanceX = Math.abs(obstacleCenterX - nextX);
+        let distanceY = Math.abs(obstacleCenterY - nextY);
 
-        // Check if the distance is less than the circle radius
-        if (distance < radius) {
-            // Adjust the circle position so that it does not intersect with the obstacle
-            let directionX = distanceX >= 0 ? 1 : -1;
-            let directionY = distanceY >= 0 ? 1 : -1;
-            let adjustX = directionX;
-            let adjustY = directionY;
-            x += adjustX;
-            y += adjustY;
+        let maxDistanceX = obstacle.width / 2 + radius;
+        let maxDistanceY = obstacle.height / 2 + radius;
 
-            // Update the velocity to zero to prevent the circle from moving through the obstacle
-            dx = 0;
-            dy = 0;
+        if (distanceX < maxDistanceX && distanceY < maxDistanceY) {
+            collision = true;
+            break;
         }
+    }
 
-        console.log(radius);
+    if (!collision) {
+        x = nextX;
+        y = nextY;
     }
 
     // Keep the circle inside the screen
@@ -194,18 +186,15 @@ function adjustBullet(obj, obstacles) {
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // ctx.drawImage(canvas, 0, 0);
-    ctx.drawImage(tankImage, x, y);
+
+    drawShots();
+    drawObstacles();
+    drawTank();
 }
 
 function gameLoop() {
     updateTank();
     render();
-
-    drawShots();
-    drawObstacles();
-    drawTank();
-
 
     requestAnimationFrame(gameLoop);
 }
