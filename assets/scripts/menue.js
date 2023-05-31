@@ -19,8 +19,9 @@ const buttons = document.querySelectorAll("button");
 const audio = new Audio("assets/sounds/startMenueMusic.mp3");
 let audioPlaying = false;
 
-audio.addEventListener("canplaythrough", () => {
-    backgroundMusic.play();
+audio.addEventListener("ended", () => {
+    audio.currentTime = 0; // Reset the audio playback position to the beginning
+    audio.play();
 });
 
 backgroundMusic.muted = true;
@@ -80,14 +81,14 @@ soundButton.addEventListener("click", () => {
     if (audio.paused) {
         audio.play();
         audio.loop = true;
-        audioPlaying = false;
+        audioPlaying = true;
         backgroundMusic.muted = false;
         soundButton.classList.remove("muted");
         soundButton.firstElementChild.src = "assets/images/sound-on.png";
         console.log("Music is playing");
     } else {
         audio.pause();
-        audioPlaying = true;
+        audioPlaying = false;
         backgroundMusic.muted = true;
         soundButton.classList.add("muted");
         soundButton.firstElementChild.src = "assets/images/sound-off.png";
