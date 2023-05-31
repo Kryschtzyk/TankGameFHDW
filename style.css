@@ -84,7 +84,7 @@ canvas {
 .controls {
   display: inline-block;
   padding: 1em;
-  float: right;
+  text-align: center;
 }
 
 .alert-box {
@@ -133,6 +133,14 @@ canvas {
   display: none;
 }
 
+.reload-button {
+  display: none;
+}
+
+.colorChange-button {
+  display: none;
+}
+
 .popup {
   display: none;
   position: fixed;
@@ -146,6 +154,7 @@ canvas {
   height: 100%;
   overflow: hidden;
 }
+
 .popup-content {
   border: 1px solid #000;
   border-radius: 8px;
