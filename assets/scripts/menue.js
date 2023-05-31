@@ -3,6 +3,8 @@ const startScreen = document.getElementById("start-screen");
 const gameScreen = document.getElementById("game-screen");
 const exitButton = document.getElementById("exit-button");
 const creditButton = document.getElementById("credit-button");
+const settingsButton = document.getElementById("settings-button");
+const reloadButton = document.getElementById("reload-button");
 const popup = document.getElementById("controls-popup");
 const body = document.querySelector("body");
 const soundButton = document.getElementById("sound-button");
@@ -33,17 +35,27 @@ startButton.addEventListener("click", function (){
     startScreen.style.display = "none";
     gameScreen.style.display = "block";
     exitButton.style.display = "block";
+    reloadButton.style.display = "block";
 });
 
 exitButton.addEventListener("click", function () {
     startScreen.style.display = "flex";
     gameScreen.style.display = "none";
     exitButton.style.display = "none";
+    reloadButton.style.display = "none";
 })
 
 creditButton.addEventListener("click", () => {
     popup.style.display = "flex";
     body.classList.add("blur");
+});
+
+settingsButton.addEventListener("click", function (){
+    // settings menu
+});
+
+reloadButton.addEventListener("click", ()=> {
+    location.reload();
 });
 
 body.addEventListener("click", (event) => {
