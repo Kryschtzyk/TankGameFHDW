@@ -54,7 +54,9 @@ settingsButton.addEventListener("click", function (){
     // settings menu
 });
 
-reloadButton.addEventListener("click", /* reload */);
+reloadButton.addEventListener("click", ()=> {
+    location.reload();
+});
 
 body.addEventListener("click", (event) => {
     if (event.target.id === "controls-popup") {
