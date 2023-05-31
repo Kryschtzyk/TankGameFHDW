@@ -5,7 +5,9 @@ const exitButton = document.getElementById("exit-button");
 const creditButton = document.getElementById("credit-button");
 const settingsButton = document.getElementById("settings-button");
 const reloadButton = document.getElementById("reload-button");
+const colorChangeButton = document.getElementById("colorChange-button");
 const popup = document.getElementById("controls-popup");
+const colorPopup = document.getElementById("color-popup");
 const body = document.querySelector("body");
 const soundButton = document.getElementById("sound-button");
 const backgroundMusic = document.getElementById("background-music");
@@ -58,11 +60,19 @@ reloadButton.addEventListener("click", ()=> {
     location.reload();
 });
 
+colorChangeButton.addEventListener("click", function () {
+    colorPopup.style.display = "flex";
+    body.classList.add("blur");
+});
+
 body.addEventListener("click", (event) => {
     if (event.target.id === "controls-popup") {
         popup.style.display = "none";
     }
-})
+    if (event.target.id === "color-popup") {
+        colorPopup.style.display = "none";
+    }
+});
 
 soundButton.addEventListener("click", () => {
     if (audio.paused) {

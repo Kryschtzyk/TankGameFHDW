@@ -92,6 +92,7 @@ canvas {
 .controls {
   display: inline-block;
   padding: 1em;
+  text-align: center;
   /* float: right; */
 }
 
@@ -145,6 +146,10 @@ canvas {
   display: none;
 }
 
+.colorChange-button {
+  display: none;
+}
+
 .popup {
   display: none;
   position: fixed;
@@ -158,6 +163,7 @@ canvas {
   height: 100%;
   overflow: hidden;
 }
+
 .popup-content {
   border: 1px solid #000;
   border-radius: 8px;
