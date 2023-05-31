@@ -31,7 +31,7 @@ buttons.forEach((button) => {
     });
 });
 
-startButton.addEventListener("click", function (){
+startButton.addEventListener("click", function () {
     startScreen.style.display = "none";
     gameScreen.style.display = "block";
     exitButton.style.display = "block";
@@ -50,12 +50,14 @@ creditButton.addEventListener("click", () => {
     body.classList.add("blur");
 });
 
-settingsButton.addEventListener("click", function (){
+settingsButton.addEventListener("click", function () {
     // settings menu
 });
 
-reloadButton.addEventListener("click", ()=> {
-    location.reload();
+reloadButton.addEventListener("click", () => {
+    obstacles = []; // Clear the obstacles array
+    shots = []; // Clear the shots array
+    generateObstacles(); // Generate new obstacles
 });
 
 body.addEventListener("click", (event) => {

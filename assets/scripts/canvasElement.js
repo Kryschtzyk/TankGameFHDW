@@ -1,9 +1,26 @@
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 
+tankImage = new Image();
+tankImage.src = 'assets/images/tank.png';
+// tankImage.onload = gameLoop;
+tankImage.onload = function () {
+    var wrh = tankImage.width / tankImage.height;
+    var newWidth = canvas.width;
+    var newHeight = newWidth / wrh;
+    if (newHeight > canvas.height) {
+        newHeight = canvas.height;
+        newWidth = newHeight * wrh;
+    }
+
+    ctx.drawImage(tankImage, 0, 0, newWidth, newHeight);
+}
+
 function resizeCanvas() {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight - 90;
+
+    prepareTankCanvas();
 }
 
 resizeCanvas();
@@ -13,22 +30,26 @@ let shots = [];
 let lastShotTime = 0; // initialize lastShotTime to 0
 
 
-const circleRadius = 5;
+const circleRadius = 2;
 const obstacleMinDistance = 100;
 
-for (let i = 0; i < 8; i++) {
-    let obstacle = {
-        x: 0,
-        y: 0,
-        width: Math.random() * 100 + 50,
-        height: Math.random() * 100 + 50,
-    };
-    do {
-        obstacle.x = Math.random() * canvas.width;
-        obstacle.y = Math.random() * canvas.height;
-    } while (isOverlap(obstacle, obstacles) || isCloseToCircle(obstacle, circleRadius, obstacleMinDistance));
-    obstacles.push(obstacle);
+function generateObstacles() {
+    for (let i = 0; i < Math.floor(Math.random() * (20 - 10 + 1) + 10); i++) {
+        let obstacle = {
+            x: 0,
+            y: 0,
+            width: Math.random() * 100 + 50,
+            height: Math.random() * 100 + 50,
+        };
+        do {
+            obstacle.x = Math.random() * canvas.width;
+            obstacle.y = Math.random() * canvas.height;
+        } while (isOverlap(obstacle, obstacles) || isCloseToCircle(obstacle, circleRadius, obstacleMinDistance));
+        obstacles.push(obstacle);
+    }
 }
+
+generateObstacles();
 
 function isOverlap(rect, rects) {
     for (let i = 0; i < rects.length; i++) {
@@ -54,15 +75,15 @@ function isCloseToCircle(rect, circleRadius, minDistance) {
 
 let x = canvas.width / 2;
 let y = canvas.height / 2;
-let radius = Math.min(canvas.width, canvas.height) / 50;
+let radius = Math.min(canvas.width, canvas.height) / 30;
 
-function drawCircle() {
+
+function prepareTankCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = 'red';
-    ctx.fill();
-    ctx.closePath();
+}
+
+function drawTank() {
+    ctx.drawImage(tankImage, x, y);
 }
 
 function drawObstacles() {
@@ -95,23 +116,28 @@ function drawShots() {
     }
 }
 
-function moveCircle() {
+function updateTank() {
     let dx = 0;
     let dy = 0;
 
-    if (keys[87]) dy -= 5; // w
-    if (keys[65]) dx -= 5; // a
-    if (keys[83]) dy += 5; // s
-    if (keys[68]) dx += 5; // d
+    if (keys[87]) dy -= 1; // w
+    if (keys[65]) dx -= 1; // a
+    if (keys[83]) dy += 1; // s
+    if (keys[68]) dx += 1; // d
 
     if (keys[81] && keys[87] || keys[81] && keys[65] || keys[81] && keys[83] || keys[81] && keys[68]) {
         const currentTime = Date.now(); // get the current time in milliseconds
-        if (currentTime - lastShotTime > 1000) { // check if at least 3 seconds have passed
+        if (currentTime - lastShotTime > 500) { // check if at least 0.5 seconds have passed
             lastShotTime = currentTime; // update lastShotTime to current time
-            let newShot = {x: x, y: y, dx: dx, dy: dy, radius: 5};
+
+            //+15 to make the bullet come out of the barrel
+            let newShot = {x: x + 15, y: y, dx: dx, dy: dy, radius: 5};
             shots.push(newShot);
         }
     }
+
+    x += dx;
+    y += dy;
 
     // Check collision with obstacles
     for (let i = 0; i < obstacles.length; i++) {
@@ -139,10 +165,8 @@ function moveCircle() {
             dy = 0;
         }
 
+        console.log(radius);
     }
-
-    x += dx;
-    y += dy;
 
     // Keep the circle inside the screen
     x = Math.max(radius, Math.min(x, canvas.width - radius));
@@ -168,14 +192,25 @@ function adjustBullet(obj, obstacles) {
     }
 }
 
+function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // ctx.drawImage(canvas, 0, 0);
+    ctx.drawImage(tankImage, x, y);
+}
 
 function gameLoop() {
-    drawCircle();
-    drawObstacles();
+    updateTank();
+    render();
+
     drawShots();
-    moveCircle();
+    drawObstacles();
+    drawTank();
+
+
     requestAnimationFrame(gameLoop);
 }
+
+window.addEventListener('resize', resizeCanvas);
 
 document.addEventListener('keydown', (event) => {
     keys[event.keyCode] = true;
