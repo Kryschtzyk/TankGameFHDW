@@ -68,14 +68,14 @@ soundButton.addEventListener("click", () => {
     if (audio.paused) {
         audio.play();
         audio.loop = true;
-        audioPlaying = true;
+        audioPlaying = false;
         backgroundMusic.muted = false;
         soundButton.classList.remove("muted");
         soundButton.firstElementChild.src = "assets/images/sound-on.png";
         console.log("Music is playing");
     } else {
         audio.pause();
-        audioPlaying = false;
+        audioPlaying = true;
         backgroundMusic.muted = true;
         soundButton.classList.add("muted");
         soundButton.firstElementChild.src = "assets/images/sound-off.png";
