@@ -106,15 +106,18 @@ canvas {
   bottom: 0;
   left: 0;
   width: 100%;
-  max-height: 8%;
+  height: 13%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgba(237, 148, 97, 0.54);
   padding: 10px;
+  box-sizing: border-box;
 }
 
 .footer-button {
+  width: 7%; /* Adjust the width to your desired size */
+  height: 120%; /* Adjust the height to your desired size */
   border-radius: 10%;
   background-color: #b28a70;
   color: #fff;
@@ -124,7 +127,16 @@ canvas {
   padding: 10px;
   margin: 0 10px;
   transition: transform 0.2s ease-in-out;
+  margin: 0 5px;
 }
+
+.footer-button img {
+  width: 100%; /* Scale the image to fit the button width */
+  height: 100%; /* Scale the image to fit the button height */
+  object-fit: contain; /* Maintain the aspect ratio of the image */
+}
+
+
 .footer-button:hover {
   transform: scale(1.1);
 }
