@@ -8,6 +8,7 @@ const reloadButton = document.getElementById("reload-button");
 const colorChangeButton = document.getElementById("colorChange-button");
 const popup = document.getElementById("controls-popup");
 const colorPopup = document.getElementById("color-popup");
+const settingsPopup = document.getElementById("settings-popup");
 const body = document.querySelector("body");
 const soundButton = document.getElementById("sound-button");
 const backgroundMusic = document.getElementById("background-music");
@@ -39,6 +40,7 @@ startButton.addEventListener("click", function () {
     gameScreen.style.display = "block";
     exitButton.style.display = "block";
     reloadButton.style.display = "block";
+    settingsButton.style.display = "block";
 });
 
 exitButton.addEventListener("click", function () {
@@ -46,6 +48,7 @@ exitButton.addEventListener("click", function () {
     gameScreen.style.display = "none";
     exitButton.style.display = "none";
     reloadButton.style.display = "none";
+    settingsButton.style.display = "none";
 })
 
 creditButton.addEventListener("click", () => {
@@ -54,7 +57,8 @@ creditButton.addEventListener("click", () => {
 });
 
 settingsButton.addEventListener("click", function () {
-    // settings menu
+    settingsPopup.style.display = "flex";
+    body.classList.add("blur");
 });
 
 reloadButton.addEventListener("click", () => {
@@ -74,6 +78,9 @@ body.addEventListener("click", (event) => {
     }
     if (event.target.id === "color-popup") {
         colorPopup.style.display = "none";
+    }
+    if (event.target.id === "settings-popup") {
+        settingsPopup.style.display = "none";
     }
 });
 
