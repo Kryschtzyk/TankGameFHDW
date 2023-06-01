@@ -1,6 +1,12 @@
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 
+const tankRed = document.getElementById("tank_red");
+const tankPink = document.getElementById("tank_pink");
+const tankPurple = document.getElementById("tank_purple");
+const tankOrange = document.getElementById("tank_orange");
+const tankGreen = document.getElementById("tank_green");
+
 tankImage = new Image();
 tankImage.src = 'assets/images/tank.png';
 tankImage.onload = gameLoop;
