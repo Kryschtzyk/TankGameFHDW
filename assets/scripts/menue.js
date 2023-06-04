@@ -61,6 +61,7 @@ reloadButton.addEventListener("click", () => {
     obstacles = []; // Clear the obstacles array
     shots = []; // Clear the shots array
     generateObstacles(); // Generate new obstacles
+    centerTank(); // Center the tank
 });
 
 colorChangeButton.addEventListener("click", function () {

@@ -14,12 +14,14 @@ function resizeCanvas() {
 
 resizeCanvas();
 
+let angle = 0;
 let obstacles = [];
 let shots = [];
 let lastShotTime = 0;
+let isShooting = false;
 
-const circleRadius = 2;
-const obstacleMinDistance = 100;
+const circleRadius = 100;
+const obstacleMinDistance = 150;
 
 function generateObstacles() {
     let minAmountObstacles = 10;
@@ -37,6 +39,11 @@ function generateObstacles() {
         } while (isOverlap(obstacle, obstacles) || isCloseToCircle(obstacle, circleRadius, obstacleMinDistance));
         obstacles.push(obstacle);
     }
+}
+
+function centerTank() {
+    x = canvas.width / 2;
+    y = canvas.height / 2;
 }
 
 generateObstacles();
@@ -76,11 +83,11 @@ function drawTank() {
     const tankWidth = tankImage.width;
     const tankHeight = tankImage.height;
 
-    const centerX = x - tankWidth / 2;
-    const centerY = y - tankHeight / 2;
-
-
-    ctx.drawImage(tankImage, centerX, centerY);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.drawImage(tankImage, -tankWidth / 2, -tankHeight / 2);
+    ctx.restore();
 }
 
 function drawObstacles() {
@@ -98,43 +105,74 @@ function drawShots() {
     const speedFactor = 1.5;
     for (let i = 0; i < shots.length; i++) {
         let shot = shots[i];
-        shot.x += shot.dx * speedFactor;
-        shot.y += shot.dy * speedFactor;
+        if (!shot.fired) {
+            shot.dx = Math.cos(shot.angle) * speedFactor;
+            shot.dy = Math.sin(shot.angle) * speedFactor;
+            shot.fired = true;
+        }
+        shot.x += shot.dx;
+        shot.y += shot.dy;
+
         ctx.beginPath();
         ctx.arc(shot.x, shot.y, shot.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'red';
         ctx.fill();
         ctx.closePath();
 
-        for (let i = 0; i < shots.length; i++) {
-            let bullet = shots[i];
-            adjustBullet(bullet, obstacles);
-        }
+        adjustBullet(shot, obstacles);
     }
 }
 
 function updateTank() {
+    let rotationSpeed = 0.01;
+    let moveSpeed = 0.5;
     let dx = 0;
     let dy = 0;
+    let dAngle = 0;
 
-    if (keys[87]) dy -= 1; // w
-    if (keys[65]) dx -= 1; // a
-    if (keys[83]) dy += 1; // s
-    if (keys[68]) dx += 1; // d
 
-    if (keys[81] && keys[87] || keys[81] && keys[65] || keys[81] && keys[83] || keys[81] && keys[68]) {
-        const currentTime = Date.now(); // get the current time in milliseconds
-        if (currentTime - lastShotTime > 500) { // check if at least 0.5 seconds have passed
-            lastShotTime = currentTime; // update lastShotTime to current time
+    if (keys[87]) { // W key
+        dx += Math.cos(angle) * moveSpeed;
+        dy += Math.sin(angle) * moveSpeed;
+        console.log(angle);
+    }
+    if (keys[83]) { // S key
+        dx -= Math.cos(angle) * moveSpeed;
+        dy -= Math.sin(angle) * moveSpeed;
+        console.log(angle);
+    }
+    if (keys[65]) { // A key
+        dAngle -= rotationSpeed;
+        console.log(dAngle);
+    }
+    if (keys[68]) { // D key
+        dAngle += rotationSpeed;
+        console.log(angle);
+    }
 
-            //+15 to make the bullet come out of the barrel
-            let newShot = {x: x + 15, y: y, dx: dx, dy: dy, radius: 5};
+    if (keys[81] && !isShooting) { // Q key
+        isShooting = true;
+
+        const currentTime = Date.now();
+        if (currentTime - lastShotTime > 500) {
+            lastShotTime = currentTime;
+
+            let newShot = { x: x + 15, y: y, dx: dx, dy: dy, radius: 5, angle: angle, fired: false };
+            //let newShot = { x: x + Math.cos(angle) * 15, y: y + Math.sin(angle) * 15, dx: dx, dy: dy, radius: 5 };
             shots.push(newShot);
         }
     }
 
+    if (!keys[81]) { // Q key released
+        isShooting = false;
+    }
+
+    angle += dAngle;
+
     let nextX = x + dx;
     let nextY = y + dy;
+    let nextAngle = angle + dAngle;
+
     let collision = false;
 
     // Check collision with obstacles
@@ -163,6 +201,14 @@ function updateTank() {
     // Keep the circle inside the screen
     x = Math.max(radius, Math.min(x, canvas.width - radius));
     y = Math.max(radius, Math.min(y, canvas.height - radius));
+
+    // Normalize the angle to be between 0 and 2*pi
+    angle = nextAngle;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Redraw the tank at the new position and rotation
+    drawTank();
 }
 
 function adjustBullet(obj, obstacles) {
