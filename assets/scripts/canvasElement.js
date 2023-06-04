@@ -19,6 +19,7 @@ let obstacles = [];
 let shots = [];
 let lastShotTime = 0;
 let isShooting = false;
+const speedFactor = 1.5;
 
 const circleRadius = 100;
 const obstacleMinDistance = 150;
@@ -102,7 +103,7 @@ function drawObstacles() {
 }
 
 function drawShots() {
-    const speedFactor = 1.5;
+
     for (let i = 0; i < shots.length; i++) {
         let shot = shots[i];
         if (!shot.fired) {
@@ -157,8 +158,17 @@ function updateTank() {
         if (currentTime - lastShotTime > 500) {
             lastShotTime = currentTime;
 
-            let newShot = { x: x + 15, y: y, dx: dx, dy: dy, radius: 5, angle: angle, fired: false };
-            //let newShot = { x: x + Math.cos(angle) * 15, y: y + Math.sin(angle) * 15, dx: dx, dy: dy, radius: 5 };
+
+            let newShot = {
+                x: x + Math.cos(angle) * (tankImage.width / 2 + 10), // Adjust the distance from the center of the tank
+                y: y + Math.sin(angle) * (tankImage.height / 2 + 10), // Adjust the distance from the center of the tank
+                dx: Math.cos(angle) * speedFactor,
+                dy: Math.sin(angle) * speedFactor,
+                radius: 5,
+                angle: angle,
+                fired: false
+            };
+
             shots.push(newShot);
         }
     }
