@@ -1,6 +1,9 @@
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 
+const singlePlayerMode = document.getElementById("singlePlayer-button");
+const multiPlayerMode = document.getElementById("multiPlayer-button");
+
 tankImage = new Image();
 tankImage.src = 'assets/images/tank.png';
 tankImage.onload = gameLoop;
