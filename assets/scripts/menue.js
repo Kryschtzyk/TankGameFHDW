@@ -36,19 +36,24 @@ buttons.forEach((button) => {
 });
 
 startButton.addEventListener("click", function () {
+    tankImage.src = document.getElementById("tank-image").src;
+
     startScreen.style.display = "none";
     gameScreen.style.display = "block";
     exitButton.style.display = "block";
     reloadButton.style.display = "block";
     settingsButton.style.display = "block";
+    colorChangeButton.style.display = "none";
+
+    // Resize the canvas and generate obstacles
+    resizeCanvas();
+    generateObstacles();
+    centerTank();
+    gameLoop();
 });
 
 exitButton.addEventListener("click", function () {
-    startScreen.style.display = "flex";
-    gameScreen.style.display = "none";
-    exitButton.style.display = "none";
-    reloadButton.style.display = "none";
-    settingsButton.style.display = "none";
+    location.reload();
 })
 
 creditButton.addEventListener("click", () => {
@@ -61,11 +66,31 @@ settingsButton.addEventListener("click", function () {
     body.classList.add("blur");
 });
 
-reloadButton.addEventListener("click", () => {
-    obstacles = []; // Clear the obstacles array
-    shots = []; // Clear the shots array
-    generateObstacles(); // Generate new obstacles
-    centerTank(); // Center the tank
+let reloadTimer = null;
+const reloadTime = 2000; // 2 seconds
+
+reloadButton.addEventListener('mousedown', () => {
+    reloadTimer = setTimeout(() => {
+        obstacles = []; // Clear the obstacles array
+        shots = []; // Clear the shots array
+        otherTanks = []; // Clear the other tanks array
+        tankHealth = 100; // Reset the tank health
+        generateObstacles(); // Generate new obstacles
+        centerTank(); // Center the tank
+        resetGame();
+        // Add any additional game reload logic here
+
+        reloadTimer = null; // Reset the timer
+    }, reloadTime);
+
+    // Start the animation for the reload timer
+    reloadButton.classList.add('reload-animation');
+});
+
+reloadButton.addEventListener('mouseup', () => {
+    clearTimeout(reloadTimer);
+    reloadTimer = null;
+    reloadButton.classList.remove('reload-animation');
 });
 
 colorChangeButton.addEventListener("click", function () {
@@ -104,3 +129,12 @@ soundButton.addEventListener("click", () => {
     }
 });
 
+function changeTankImage(newImageSrc) {
+    const tankImage = document.getElementById("tank-image");
+    tankImage.src = newImageSrc;
+}
+
+function centerTank() {
+    x = canvas.width / 2;
+    y = canvas.height / 2;
+}

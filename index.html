@@ -23,6 +23,8 @@
 <div id="controls-popup" class="popup">
     <div class="popup-content">
         <div class="controls">
+            <h2>⟳ - Hold the reload button for 2 Seconds to reload the game.</h2>
+            <br>
             <h2>Controls for Singleplayer:</h2>
             <p><kbd>W</kbd> <kbd>S</kbd> – move forward/backward</p>
             <p><kbd>A</kbd> <kbd>D</kbd> – rotate left/right</p>
@@ -39,12 +41,23 @@
     <div class="popup-content">
         <div class="controls">
             <h2>Change the Color of your Tank</h2>
-                <div>
+
+                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_red.png')">
                     <img class="footer-image" src="assets/images/tank_red.png" alt="TankInRed">
+                </button>
+                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_purple.png')">
                     <img class="footer-image" src="assets/images/tank_purple.png" alt="TankInPurple">
+                </button>
+                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_pink.png')">
                     <img class="footer-image" src="assets/images/tank_pink.png" alt="TankInPink">
+                </button>
+                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_orange.png')">
                     <img class="footer-image" src="assets/images/tank_orange.png" alt="TankInOrange">
-                </div>
+                </button>
+
+
+            <img id="tank-image" class="tank-image" src="assets/images/tank_red.png" alt="TankInRed">
+
         </div>
     </div>
 </div>
@@ -55,7 +68,7 @@
             <h2>Game Mode</h2>
                 <div>
                     <button id="singlePlayer-button"><img class="footer-image" src="assets/images/tank_transparent.png" alt="singlePlayerButton"></button>
-                    <button id="multiPlayer-button"><img class="footer-image" src="assets/images/tank_transparent.png" alt="Exit"><img class="footer-image" src="assets/images/tank_transparent.png"></button>
+                    <button id="multiPlayer-button"><img class="footer-image" src="assets/images/tank_transparent.png" alt="Exit"><img class="footer-image" src="assets/images/tank_transparent.png" alt="Exit"></button>
                 </div>
         </div>
     </div>

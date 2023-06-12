@@ -99,9 +99,10 @@ canvas {
 }
 
 .controls {
-  display: inline-block;
+  display: grid;
   padding: 1em;
-  float: right;
+  justify-content: center;
+  align-items: center;
 }
 
 .alert-box {
@@ -151,6 +152,26 @@ canvas {
   display: none;
 }
 
+.reload-button {
+  display: none;
+  background-color: #b28a70;
+  transition: background-color 1000ms ease;
+  rotate: 90deg;
+}
+
+
+.tank-image {
+  width: 60px; /* Set the desired width */
+  height: auto; /* Maintain the aspect ratio */
+  margin-top: 20px; /* Adjust the top margin as needed */
+  display: block; /* Center the image */
+  margin-left: auto; /* Center the image horizontally */
+  margin-right: auto; /* Center the image horizontally */
+  border: 3px solid black; /* Add a solid border with 1px width */
+  border-radius: 10px;
+  padding: 10px;
+}
+
 .popup {
   display: none;
   position: fixed;
@@ -177,4 +198,15 @@ canvas {
   }
 }
 
+.reload-animation {
+  animation: reload-timer 2s linear;
+}
 
+@keyframes reload-timer {
+  0% {
+    background-color: #b28a70;
+  }
+  100% {
+    background-color: #7f9142;
+  }
+}
