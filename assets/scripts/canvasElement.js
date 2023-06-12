@@ -19,8 +19,16 @@ let otherTanks = [];
 let tankHealth = 100;
 
 
+let lastResizeTime = 0;
+const resizeCooldown = 2000; // 2 seconds
+
 // Resize the canvas to fit the window
 function resizeCanvas() {
+
+    const currentTime = Date.now();
+    if (currentTime - lastResizeTime < resizeCooldown) {
+        return; // Do nothing if the cooldown period hasn't elapsed
+    }
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight - 90;
 
@@ -106,8 +114,8 @@ function generateObstacles() {
         };
 
         do {
-            tank.x = Math.random() * canvas.width;
-            tank.y = Math.random() * canvas.height;
+            tank.x = Math.random() * (canvas.width - tank.width);
+            tank.y = Math.random() * (canvas.height - tank.height);
         } while (
             isOverlap(tank, obstacles) ||
             isCloseToCircle(tank, circleRadius, obstacleMinDistance) ||
@@ -177,6 +185,7 @@ function prepareTankCanvas() {
 // Draw the tank
 
 function drawTank() {
+
     const tankWidth = tankImage.width;
     const tankHeight = tankImage.height;
 
@@ -185,6 +194,15 @@ function drawTank() {
     ctx.rotate(angle);
     ctx.drawImage(tankImage, -tankWidth / 2, -tankHeight / 2);
     ctx.restore();
+
+    for (let i = 0; i < otherTanks.length; i++) {
+        const tank = otherTanks[i];
+        ctx.save();
+        ctx.translate(tank.x, tank.y);
+        ctx.rotate(tank.angle);
+        ctx.drawImage(tankImage, -tankWidth / 2, -tankHeight / 2);
+        ctx.restore();
+    }
 
     drawHealthBar(); // Call the drawHealthBar() function inside drawTank()
 }

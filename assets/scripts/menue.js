@@ -67,6 +67,7 @@ reloadButton.addEventListener('mousedown', () => {
     reloadTimer = setTimeout(() => {
         obstacles = []; // Clear the obstacles array
         shots = []; // Clear the shots array
+        otherTanks = []; // Clear the other tanks array
         generateObstacles(); // Generate new obstacles
         centerTank(); // Center the tank
 
