@@ -8,7 +8,6 @@ const multiPlayerMode = document.getElementById("multiPlayer-button");
 // Tank image
 let tankImage = new Image();
 tankImage.src = document.getElementById("tank-image").src;
-tankImage.onload = gameLoop;
 
 // Generate obstacles
 let obstacles = [];
@@ -143,9 +142,10 @@ class Tank {
         ctx.rotate(this.angle);
         ctx.drawImage(tankImage, -this.width / 2, -this.height / 2);
         ctx.restore();
+
+        drawHealthBar();
     }
 }
-
 
 // Tank position and angle
 let x = canvas.width / 2;
@@ -164,10 +164,6 @@ const keys = {};
 // Tank radius
 const radius = Math.min(canvas.width, canvas.height) / 32;
 
-// Resize the canvas and generate obstacles
-resizeCanvas();
-generateObstacles();
-
 // Event listeners for keydown and keyup
 document.addEventListener('keydown', (event) => {
     keys[event.keyCode] = true;
@@ -183,7 +179,6 @@ function prepareTankCanvas() {
 }
 
 // Draw the tank
-
 function drawTank() {
 
     const tankWidth = tankImage.width;
@@ -199,9 +194,11 @@ function drawTank() {
         const tank = otherTanks[i];
         ctx.save();
         ctx.translate(tank.x, tank.y);
+
         ctx.rotate(tank.angle);
         ctx.drawImage(tankImage, -tankWidth / 2, -tankHeight / 2);
         ctx.restore();
+        drawHealthBar();
     }
 
     drawHealthBar(); // Call the drawHealthBar() function inside drawTank()
@@ -237,6 +234,7 @@ function drawObstacles() {
     for (let i = 0; i < otherTanks.length; i++) {
         const tank = new Tank(otherTanks[i]);
         tank.draw();
+
     }
 }
 
@@ -460,9 +458,11 @@ centerTank();
 // The game loop
 function gameLoop() {
     updateTank();
-    updateOtherTanks();
     render();
     requestAnimationFrame(gameLoop);
+    setTimeout(function() {
+        updateOtherTanks();
+    }, 3000);
 }
 
 function resetGame() {
@@ -473,7 +473,6 @@ function resetGame() {
     tankHealth = 100; // Reset the tank health
     generateObstacles(); // Generate new obstacles
     centerTank(); // Center the tank
-    gameLoop(); // Start the game loop
 }
 
 function updateOtherTanks() {
@@ -493,6 +492,8 @@ function updateOtherTanks() {
                 radius: 5,
                 angle: angle,
                 fired: false
+
+
             };
             shots.push(newShot);
         }
@@ -507,6 +508,3 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keyup', (event) => {
     keys[event.keyCode] = false;
 });
-
-// Start the game
-gameLoop();

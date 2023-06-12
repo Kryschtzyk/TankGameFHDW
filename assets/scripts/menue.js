@@ -44,6 +44,12 @@ startButton.addEventListener("click", function () {
     reloadButton.style.display = "block";
     settingsButton.style.display = "block";
     colorChangeButton.style.display = "none";
+
+    // Resize the canvas and generate obstacles
+    resizeCanvas();
+    generateObstacles();
+    centerTank();
+    gameLoop();
 });
 
 exitButton.addEventListener("click", function () {
