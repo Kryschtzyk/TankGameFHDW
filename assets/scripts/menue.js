@@ -48,8 +48,13 @@ startButton.addEventListener("click", function () {
     // Resize the canvas and generate obstacles
     resizeCanvas();
     generateObstacles();
+    generateKiTanks();
     centerTank();
     gameLoop();
+
+    setTimeout(function() {
+        shootPermission = true;
+    }, 3000);
 });
 
 exitButton.addEventListener("click", function () {
@@ -76,6 +81,7 @@ reloadButton.addEventListener('mousedown', () => {
         otherTanks = []; // Clear the other tanks array
         tankHealth = 100; // Reset the tank health
         generateObstacles(); // Generate new obstacles
+        generateKiTanks();
         centerTank(); // Center the tank
         resetGame();
         // Add any additional game reload logic here

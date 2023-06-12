@@ -16,8 +16,9 @@ const obstacleMinDistance = 150;
 const healthBarWidth = 5;
 let otherTanks = [];
 let tankHealth = 100;
-let shootPermission = true;
-
+let shootPermission = false;
+let minAmountTanks = 0;
+let maxAmountTanks = 1;
 
 let lastResizeTime = 0;
 const resizeCooldown = 2000; // 2 seconds
@@ -35,118 +36,6 @@ function resizeCanvas() {
     prepareTankCanvas();
 }
 
-function isOverlap(rect, rects) {
-    for (let i = 0; i < rects.length; i++) {
-        let otherRect = rects[i];
-        if (rect.x < otherRect.x + otherRect.width &&
-            rect.x + rect.width > otherRect.x &&
-            rect.y < otherRect.y + otherRect.height &&
-            rect.y + rect.height > otherRect.y) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function isCloseToCircle(rect, circleRadius, minDistance) {
-    let circleX = canvas.width / 2;
-    let circleY = canvas.height / 2;
-    let rectCenterX = rect.x + rect.width / 2;
-    let rectCenterY = rect.y + rect.height / 2;
-    let distance = Math.sqrt((circleX - rectCenterX) ** 2 + (circleY - rectCenterY) ** 2);
-    return distance < circleRadius + minDistance + Math.max(rect.width, rect.height) / 2;
-}
-
-function isCloseToTanks(rect, tanks) {
-    const minDistance = 150;
-
-    for (let i = 0; i < tanks.length; i++) {
-        let tank = tanks[i];
-        let tankCenterX = tank.x + tank.width / 2;
-        let tankCenterY = tank.y + tank.height / 2;
-        let distanceX = Math.abs(tankCenterX - rect.x - rect.width / 2);
-        let distanceY = Math.abs(tankCenterY - rect.y - rect.height / 2);
-
-        if (distanceX < minDistance && distanceY < minDistance) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-function generateObstacles() {
-    const minAmountObstacles = 10;
-    const maxAmountObstacles = 20;
-
-    for (let i = 0; i < Math.floor(Math.random() * (maxAmountObstacles - minAmountObstacles + 1) + 10); i++) {
-        let obstacle = {
-            x: 0,
-            y: 0,
-            width: Math.random() * 100 + 50,
-            height: Math.random() * 100 + 50,
-        };
-
-        do {
-            obstacle.x = Math.random() * canvas.width;
-            obstacle.y = Math.random() * canvas.height;
-        } while (
-            isOverlap(obstacle, obstacles) ||
-            isCloseToCircle(obstacle, circleRadius, obstacleMinDistance) ||
-            isCloseToTanks(obstacle, otherTanks)
-            );
-
-        obstacles.push(obstacle);
-    }
-
-    // Generate tanks
-    const minAmountTanks = 6;
-    const maxAmountTanks = 10;
-
-    for (let i = 0; i < Math.floor(Math.random() * (maxAmountTanks - minAmountTanks + 1) + minAmountTanks); i++) {
-        let tank = {
-            x: 0,
-            y: 0,
-            width: 60,
-            height: 30,
-            health: 100
-        };
-
-        do {
-            tank.x = Math.random() * (canvas.width - tank.width);
-            tank.y = Math.random() * (canvas.height - tank.height);
-        } while (
-            isOverlap(tank, obstacles) ||
-            isCloseToCircle(tank, circleRadius, obstacleMinDistance) ||
-            isCloseToTanks(tank, otherTanks)
-            );
-
-        otherTanks.push(tank);
-    }
-}
-
-
-class Tank {
-    constructor(x, y, angle) {
-        this.x = x;
-        this.y = y;
-        this.angle = angle;
-        this.width = tankImage.width;
-        this.height = tankImage.height;
-        this.health = 100;
-    }
-
-    draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
-        ctx.drawImage(tankImage, -this.width / 2, -this.height / 2);
-        ctx.restore();
-
-        drawHealthBar();
-    }
-}
 
 // Tank position and angle
 let x = canvas.width / 2;
@@ -178,6 +67,28 @@ document.addEventListener('keyup', (event) => {
 function prepareTankCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
+
+class Tank {
+    constructor(x, y, angle) {
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+        this.width = tankImage.width;
+        this.height = tankImage.height;
+        this.health = 100;
+    }
+
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.drawImage(tankImage, -this.width / 2, -this.height / 2);
+        ctx.restore();
+
+        drawHealthBar();
+    }
+}
+
 
 // Draw the tank
 function drawTank() {
@@ -274,6 +185,11 @@ function updateTank() {
     let dx = 0;
     let dy = 0;
     let dAngle = 0;
+
+    if (keys[16] && minAmountTanks <= 5) {
+        rotationSpeed = 0.01;
+        moveSpeed = 0.75;
+    }
 
     if (keys[87]) { // W key
         dx += Math.cos(angle) * moveSpeed;
@@ -421,6 +337,7 @@ function adjustBullet(bullet, obstacles) {
         // Decrease the health of the player tank when hit
         tankHealth -= 25;
         if (tankHealth <= 0) {
+            //TODO: ADD GAME OVER HERE
             resetGame();
             return;
         }
@@ -463,9 +380,18 @@ centerTank();
 function gameLoop() {
     updateTank();
     render();
-    requestAnimationFrame(gameLoop);
-    updateOtherTanks();
 
+    requestAnimationFrame(gameLoop);
+    setTimeout(function() {
+        updateOtherTanks();
+    }, 3000);
+
+    if(otherTanks.length === 0) {
+        minAmountTanks++;
+        maxAmountTanks++;
+        generateKiTanks();
+        console.log("minAmount:" + minAmountTanks + "maxAmount:" + maxAmountTanks);
+    }
 }
 
 function resetGame() {
@@ -475,6 +401,7 @@ function resetGame() {
     otherTanks = []; // Clear the other tanks array
     tankHealth = 100; // Reset the tank health
     generateObstacles(); // Generate new obstacles
+    generateKiTanks();
     centerTank(); // Center the tank
     shootPermission = false;
     setTimeout(function() {
