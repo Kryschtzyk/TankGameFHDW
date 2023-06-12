@@ -16,6 +16,7 @@ const obstacleMinDistance = 150;
 const healthBarWidth = 5;
 let otherTanks = [];
 let tankHealth = 100;
+let shootPermission = true;
 
 
 let lastResizeTime = 0;
@@ -194,7 +195,6 @@ function drawTank() {
         const tank = otherTanks[i];
         ctx.save();
         ctx.translate(tank.x, tank.y);
-
         ctx.rotate(tank.angle);
         ctx.drawImage(tankImage, -tankWidth / 2, -tankHeight / 2);
         ctx.restore();
@@ -234,7 +234,6 @@ function drawObstacles() {
     for (let i = 0; i < otherTanks.length; i++) {
         const tank = new Tank(otherTanks[i]);
         tank.draw();
-
     }
 }
 
@@ -355,6 +354,13 @@ function updateTank() {
 }
 
 function adjustBullet(bullet, obstacles) {
+    // Check if bullet is out of bounds
+    if (bullet.x < 0 || bullet.x > canvas.width || bullet.y < 0 || bullet.y > canvas.height) {
+        // Remove the bullet from the shots array
+        shots.splice(shots.indexOf(bullet), 1);
+        return;
+    }
+
     // Check for collisions with obstacles
     for (let i = 0; i < obstacles.length; i++) {
         let obstacle = obstacles[i];
@@ -424,23 +430,21 @@ function adjustBullet(bullet, obstacles) {
 
     // Check for collisions with other tanks
     for (let i = 0; i < otherTanks.length; i++) {
-        let tank = otherTanks[i];
-        let distanceX = bullet.x - tank.x;
-        let distanceY = bullet.y - tank.y;
+        let botTank = otherTanks[i];
+        let distanceX = bullet.x - botTank.x;
+        let distanceY = bullet.y - botTank.y;
         let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-        if (distance < bullet.radius + tank.width / 2) {
+        if (distance < bullet.radius + botTank.width / 2) {
             // Remove the bullet from the shots array
             shots.splice(shots.indexOf(bullet), 1);
-
-            // Decrease the health of the tank when hit
-            tank.health -= 25;
-            if (tank.health <= 0) {
-                // Remove the tank from the otherTanks array if its health is depleted
+            // Decrease the health of the botTank when hit
+            botTank.health -= 25;
+            if (botTank.health <= 0) {
+                // Remove the botTank from the otherTanks array if its health is depleted
                 otherTanks.splice(i, 1);
+                i++;
             }
-
-            return;
         }
     }
 }
@@ -460,9 +464,8 @@ function gameLoop() {
     updateTank();
     render();
     requestAnimationFrame(gameLoop);
-    setTimeout(function() {
-        updateOtherTanks();
-    }, 3000);
+    updateOtherTanks();
+
 }
 
 function resetGame() {
@@ -473,6 +476,10 @@ function resetGame() {
     tankHealth = 100; // Reset the tank health
     generateObstacles(); // Generate new obstacles
     centerTank(); // Center the tank
+    shootPermission = false;
+    setTimeout(function() {
+        shootPermission = true;
+    }, 3000);
 }
 
 function updateOtherTanks() {
@@ -480,7 +487,7 @@ function updateOtherTanks() {
         let tank = otherTanks[i];
 
         // Randomly shoot at the player tank
-        if (Math.random() < 0.002) {
+        if (Math.random() < 0.002 && shootPermission === true) {
             const dx = x - tank.x;
             const dy = y - tank.y;
             const angle = Math.atan2(dy, dx);

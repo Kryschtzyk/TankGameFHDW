@@ -77,7 +77,7 @@ reloadButton.addEventListener('mousedown', () => {
         tankHealth = 100; // Reset the tank health
         generateObstacles(); // Generate new obstacles
         centerTank(); // Center the tank
-
+        resetGame();
         // Add any additional game reload logic here
 
         reloadTimer = null; // Reset the timer
