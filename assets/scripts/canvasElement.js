@@ -5,6 +5,8 @@ const ctx = canvas.getContext('2d');
 const singlePlayerMode = document.getElementById("singlePlayer-button");
 const multiPlayerMode = document.getElementById("multiPlayer-button");
 
+const levelLabel = document.getElementById("level-footer");
+
 // Tank image
 let tankImage = new Image();
 tankImage.src = document.getElementById("tank-image").src;
@@ -17,8 +19,9 @@ const healthBarWidth = 5;
 let otherTanks = [];
 let tankHealth = 100;
 let shootPermission = false;
-let minAmountTanks = 0;
-let maxAmountTanks = 1;
+let minAmountTanks = 1;
+let maxAmountTanks = 2;
+let gameOver = false;
 
 let lastResizeTime = 0;
 const resizeCooldown = 2000; // 2 seconds
@@ -109,7 +112,6 @@ function drawTank() {
         ctx.rotate(tank.angle);
         ctx.drawImage(tankImage, -tankWidth / 2, -tankHeight / 2);
         ctx.restore();
-        drawHealthBar();
     }
 
     drawHealthBar(); // Call the drawHealthBar() function inside drawTank()
@@ -186,7 +188,7 @@ function updateTank() {
     let dy = 0;
     let dAngle = 0;
 
-    if (keys[16] && minAmountTanks <= 5) {
+    if (keys[16] && minAmountTanks >= 5) {
         rotationSpeed = 0.01;
         moveSpeed = 0.75;
     }
@@ -206,7 +208,7 @@ function updateTank() {
         dAngle += rotationSpeed;
     }
 
-    if (keys[81] && !isShooting) { // Q key
+    if (keys[81] && !isShooting && !gameOver) { // Q key
         isShooting = true;
 
         const currentTime = Date.now();
@@ -266,7 +268,6 @@ function updateTank() {
     angle = nextAngle;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawTank();
 }
 
 function adjustBullet(bullet, obstacles) {
@@ -337,8 +338,13 @@ function adjustBullet(bullet, obstacles) {
         // Decrease the health of the player tank when hit
         tankHealth -= 25;
         if (tankHealth <= 0) {
-            //TODO: ADD GAME OVER HERE
-            resetGame();
+            const gameOverPopup = document.getElementById("game-over-popup");
+            gameOverPopup.style.display = "flex"; // Show the game over popup
+
+            shootPermission = false; // Stop the player from shooting
+            tankHealth = 100; // Reset the player tank's health
+            gameOver = true; // Set the game over flag to true
+
             return;
         }
 
@@ -376,6 +382,7 @@ function render() {
 }
 centerTank();
 
+let level = 1;
 // The game loop
 function gameLoop() {
     updateTank();
@@ -387,6 +394,8 @@ function gameLoop() {
     }, 3000);
 
     if(otherTanks.length === 0) {
+        level++;
+        levelLabel.textContent = `Level: ${level}`;
         minAmountTanks++;
         maxAmountTanks++;
         generateKiTanks();
@@ -400,6 +409,10 @@ function resetGame() {
     bullets = []; // Clear the bullets array
     otherTanks = []; // Clear the other tanks array
     tankHealth = 100; // Reset the tank health
+    let level = 1;
+    levelLabel.textContent = `Level: ${level}`;
+    minAmountTanks = 1;
+    maxAmountTanks = 2;
     generateObstacles(); // Generate new obstacles
     generateKiTanks();
     centerTank(); // Center the tank
@@ -419,15 +432,13 @@ function updateOtherTanks() {
             const dy = y - tank.y;
             const angle = Math.atan2(dy, dx);
             let newShot = {
-                x: tank.x + Math.cos(angle) * (tank.width / 2 + 10),
-                y: tank.y + Math.sin(angle) * (tank.height / 2 + 10),
+                x: tank.x + Math.cos(angle) * (tank.width / 2 + 20),
+                y: tank.y + Math.sin(angle) * (tank.height / 2 + 20),
                 dx: Math.cos(angle) * speedFactor,
                 dy: Math.sin(angle) * speedFactor,
                 radius: 5,
                 angle: angle,
                 fired: false
-
-
             };
             shots.push(newShot);
         }

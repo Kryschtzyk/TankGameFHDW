@@ -43,6 +43,7 @@ startButton.addEventListener("click", function () {
     exitButton.style.display = "block";
     reloadButton.style.display = "block";
     settingsButton.style.display = "block";
+    levelLabel.style.display = "block";
     colorChangeButton.style.display = "none";
 
     // Resize the canvas and generate obstacles
@@ -84,6 +85,9 @@ reloadButton.addEventListener('mousedown', () => {
         generateKiTanks();
         centerTank(); // Center the tank
         resetGame();
+        gameOver = false; // Set the game over flag to true
+        const gameOverPopup = document.getElementById("game-over-popup");
+        gameOverPopup.style.display = "none"; // Show the game over popup
         // Add any additional game reload logic here
 
         reloadTimer = null; // Reset the timer
