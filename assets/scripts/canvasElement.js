@@ -101,8 +101,8 @@ function generateObstacles() {
     }
 
     // Generate tanks
-    const minAmountTanks = 3;
-    const maxAmountTanks = 5;
+    const minAmountTanks = 6;
+    const maxAmountTanks = 10;
 
     for (let i = 0; i < Math.floor(Math.random() * (maxAmountTanks - minAmountTanks + 1) + minAmountTanks); i++) {
         let tank = {
@@ -356,32 +356,84 @@ function updateTank() {
     drawTank();
 }
 
-// Adjust bullet position and check for collisions with obstacles
-function adjustBullet(obj, obstacles) {
+function adjustBullet(bullet, obstacles) {
+    // Check for collisions with obstacles
     for (let i = 0; i < obstacles.length; i++) {
         let obstacle = obstacles[i];
-        let closestX = Math.max(obstacle.x, Math.min(obj.x, obstacle.x + obstacle.width));
-        let closestY = Math.max(obstacle.y, Math.min(obj.y, obstacle.y + obstacle.height));
-        let distanceX = obj.x - closestX;
-        let distanceY = obj.y - closestY;
-        let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        let bulletLeft = bullet.x - bullet.radius;
+        let bulletRight = bullet.x + bullet.radius;
+        let bulletTop = bullet.y - bullet.radius;
+        let bulletBottom = bullet.y + bullet.radius;
 
-        if (distance < obj.radius || distance < obj.size) {
-            obj.radius = 0;
-            obj.size = 0;
+        let obstacleLeft = obstacle.x;
+        let obstacleRight = obstacle.x + obstacle.width;
+        let obstacleTop = obstacle.y;
+        let obstacleBottom = obstacle.y + obstacle.height;
+
+        if (
+            bulletRight >= obstacleLeft &&
+            bulletLeft <= obstacleRight &&
+            bulletBottom >= obstacleTop &&
+            bulletTop <= obstacleBottom
+        ) {
+            // AABB collision occurred, perform detailed collision check
+
+            // Calculate the overlap on each axis
+            let overlapX = Math.min(bulletRight - obstacleLeft, obstacleRight - bulletLeft);
+            let overlapY = Math.min(bulletBottom - obstacleTop, obstacleBottom - bulletTop);
+
+            // Determine the axis of least penetration
+            if (overlapX < overlapY) {
+                // Colliding horizontally, adjust bullet's position
+                if (bullet.x < obstacle.x) {
+                    bullet.x -= overlapX;
+                } else {
+                    bullet.x += overlapX;
+                }
+            } else {
+                // Colliding vertically, adjust bullet's position
+                if (bullet.y < obstacle.y) {
+                    bullet.y -= overlapY;
+                } else {
+                    bullet.y += overlapY;
+                }
+            }
+
+            // Remove the bullet from the shots array
+            shots.splice(shots.indexOf(bullet), 1);
+            return;
         }
+    }
+
+    // Check for collisions with the player tank
+    let distanceX = bullet.x - x;
+    let distanceY = bullet.y - y;
+    let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+    if (distance < bullet.radius + radius) {
+        // Remove the bullet from the shots array
+        shots.splice(shots.indexOf(bullet), 1);
+
+        // Decrease the health of the player tank when hit
+        tankHealth -= 25;
+        if (tankHealth <= 0) {
+            resetGame();
+            return;
+        }
+
+        return;
     }
 
     // Check for collisions with other tanks
     for (let i = 0; i < otherTanks.length; i++) {
         let tank = otherTanks[i];
-        let distanceX = obj.x - tank.x;
-        let distanceY = obj.y - tank.y;
+        let distanceX = bullet.x - tank.x;
+        let distanceY = bullet.y - tank.y;
         let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-        if (distance < obj.radius + tank.width / 2) {
-            obj.radius = 0;
-            obj.size = 0;
+        if (distance < bullet.radius + tank.width / 2) {
+            // Remove the bullet from the shots array
+            shots.splice(shots.indexOf(bullet), 1);
 
             // Decrease the health of the tank when hit
             tank.health -= 25;
@@ -408,8 +460,43 @@ centerTank();
 // The game loop
 function gameLoop() {
     updateTank();
+    updateOtherTanks();
     render();
     requestAnimationFrame(gameLoop);
+}
+
+function resetGame() {
+    obstacles = []; // Clear the obstacles array
+    shots = []; // Clear the shots array
+    bullets = []; // Clear the bullets array
+    otherTanks = []; // Clear the other tanks array
+    tankHealth = 100; // Reset the tank health
+    generateObstacles(); // Generate new obstacles
+    centerTank(); // Center the tank
+    gameLoop(); // Start the game loop
+}
+
+function updateOtherTanks() {
+    for (let i = 0; i < otherTanks.length; i++) {
+        let tank = otherTanks[i];
+
+        // Randomly shoot at the player tank
+        if (Math.random() < 0.002) {
+            const dx = x - tank.x;
+            const dy = y - tank.y;
+            const angle = Math.atan2(dy, dx);
+            let newShot = {
+                x: tank.x + Math.cos(angle) * (tank.width / 2 + 10),
+                y: tank.y + Math.sin(angle) * (tank.height / 2 + 10),
+                dx: Math.cos(angle) * speedFactor,
+                dy: Math.sin(angle) * speedFactor,
+                radius: 5,
+                angle: angle,
+                fired: false
+            };
+            shots.push(newShot);
+        }
+    }
 }
 
 // Event listeners
