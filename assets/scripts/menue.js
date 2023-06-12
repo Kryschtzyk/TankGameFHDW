@@ -36,6 +36,8 @@ buttons.forEach((button) => {
 });
 
 startButton.addEventListener("click", function () {
+    tankImage.src = document.getElementById("tank-image").src;
+
     startScreen.style.display = "none";
     gameScreen.style.display = "block";
     exitButton.style.display = "block";
