@@ -13,6 +13,7 @@ const body = document.querySelector("body");
 const soundButton = document.getElementById("sound-button");
 const backgroundMusic = document.getElementById("background-music");
 const audioState = document.getElementById('background-audio');
+const footer = document.getElementsByClassName("footer");
 
 const buttonClickSound = new Audio('assets/sounds/buttonSound.mp3');
 const buttons = document.querySelectorAll("button");
@@ -38,11 +39,17 @@ buttons.forEach((button) => {
 startButton.addEventListener("click", function () {
     tankImage.src = document.getElementById("tank-image").src;
 
+    let audio = new Audio("assets/sounds/startGame.wav");
+    if(backgroundMusic.muted === false) {
+        audio.play();
+    }
+
     startScreen.style.display = "none";
     gameScreen.style.display = "block";
     exitButton.style.display = "block";
     reloadButton.style.display = "block";
-    settingsButton.style.display = "block";
+    settingsButton.style.display = "none";
+    levelLabel.style.display = "block";
     colorChangeButton.style.display = "none";
 
     // Resize the canvas and generate obstacles
@@ -54,7 +61,7 @@ startButton.addEventListener("click", function () {
 
     setTimeout(function() {
         shootPermission = true;
-    }, 3000);
+    }, 3000)
 });
 
 exitButton.addEventListener("click", function () {
@@ -84,6 +91,9 @@ reloadButton.addEventListener('mousedown', () => {
         generateKiTanks();
         centerTank(); // Center the tank
         resetGame();
+        gameOver = false; // Set the game over flag to true
+        const gameOverPopup = document.getElementById("game-over-popup");
+        gameOverPopup.style.display = "none"; // Show the game over popup
         // Add any additional game reload logic here
 
         reloadTimer = null; // Reset the timer

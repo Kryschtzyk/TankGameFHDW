@@ -1,13 +1,22 @@
 // Get the canvas and context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 
 const singlePlayerMode = document.getElementById("singlePlayer-button");
 const multiPlayerMode = document.getElementById("multiPlayer-button");
 
+const levelLabel = document.getElementById("level-footer");
+let shotAudio = new Audio('./assets/sounds/shotSound.mp3');
+
 // Tank image
 let tankImage = new Image();
 tankImage.src = document.getElementById("tank-image").src;
+
+let obstacleImage = new Image();
+obstacleImage.src = "./assets/images/stoneTexture.png";
+body.style.backgroundImage = "url('./assets/images/backgroundTexture.png')";
+
 
 // Generate obstacles
 let obstacles = [];
@@ -17,11 +26,13 @@ const healthBarWidth = 5;
 let otherTanks = [];
 let tankHealth = 100;
 let shootPermission = false;
-let minAmountTanks = 0;
-let maxAmountTanks = 1;
+let minAmountTanks = 1;
+let maxAmountTanks = 2;
+let gameOver = false;
 
 let lastResizeTime = 0;
 const resizeCooldown = 2000; // 2 seconds
+let lastTick = Date.now();
 
 // Resize the canvas to fit the window
 function resizeCanvas() {
@@ -109,7 +120,6 @@ function drawTank() {
         ctx.rotate(tank.angle);
         ctx.drawImage(tankImage, -tankWidth / 2, -tankHeight / 2);
         ctx.restore();
-        drawHealthBar();
     }
 
     drawHealthBar(); // Call the drawHealthBar() function inside drawTank()
@@ -135,7 +145,7 @@ function drawObstacles() {
     for (let i = 0; i < obstacles.length; i++) {
         let obstacle = obstacles[i];
         ctx.beginPath();
-        ctx.rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.drawImage(obstacleImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         ctx.fillStyle = 'gray';
         ctx.fill();
         ctx.closePath();
@@ -149,13 +159,13 @@ function drawObstacles() {
 }
 
 // Draw shots
-function drawShots() {
+function drawShots(tickDeltaShots) {
     for (let i = 0; i < shots.length; i++) {
         let shot = shots[i];
 
         if (!shot.fired) {
-            shot.dx = Math.cos(shot.angle) * speedFactor;
-            shot.dy = Math.sin(shot.angle) * speedFactor;
+            shot.dx = Math.cos(shot.angle) * speedFactor * tickDeltaShots * 0.25;
+            shot.dy = Math.sin(shot.angle) * speedFactor * tickDeltaShots * 0.25;
             shot.fired = true;
         }
 
@@ -170,7 +180,7 @@ function drawShots() {
 
         ctx.beginPath();
         ctx.arc(shot.x, shot.y, shot.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = 'black';
         ctx.fill();
         ctx.closePath();
 
@@ -179,16 +189,16 @@ function drawShots() {
 }
 
 // Update tank position and angle based on keyboard input
-function updateTank() {
-    let rotationSpeed = 0.0055;
-    let moveSpeed = 0.5;
+function updateTank(tickDelta) {
+    let rotationSpeed = 0.0055 * tickDelta * 0.25;
+    let moveSpeed = 0.5 * tickDelta * 0.25;
     let dx = 0;
     let dy = 0;
     let dAngle = 0;
 
-    if (keys[16] && minAmountTanks <= 5) {
-        rotationSpeed = 0.01;
-        moveSpeed = 0.75;
+    if (keys[16] && minAmountTanks >= 1) {
+        rotationSpeed += 0.01;
+        moveSpeed += 0.5;
     }
 
     if (keys[87]) { // W key
@@ -206,12 +216,16 @@ function updateTank() {
         dAngle += rotationSpeed;
     }
 
-    if (keys[81] && !isShooting) { // Q key
+    if (keys[81] && !isShooting && !gameOver) { // Q key
         isShooting = true;
 
         const currentTime = Date.now();
         if (currentTime - lastShotTime > 500) {
             lastShotTime = currentTime;
+            console.log(backgroundMusic.muted);
+            if (backgroundMusic.muted === false) {
+                shotAudio.play();
+            }
 
             let newShot = {
                 x: x + Math.cos(angle) * (tankImage.width / 2 + 10),
@@ -266,7 +280,6 @@ function updateTank() {
     angle = nextAngle;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawTank();
 }
 
 function adjustBullet(bullet, obstacles) {
@@ -337,8 +350,17 @@ function adjustBullet(bullet, obstacles) {
         // Decrease the health of the player tank when hit
         tankHealth -= 25;
         if (tankHealth <= 0) {
-            //TODO: ADD GAME OVER HERE
-            resetGame();
+            if (backgroundMusic.muted === false) {
+                let gameOverMusic = new Audio("assets/sounds/game-over.wav");
+                gameOverMusic.play();
+            }
+            const gameOverPopup = document.getElementById("game-over-popup");
+            gameOverPopup.style.display = "flex"; // Show the game over popup
+            level = 1; // Reset the level
+            shootPermission = false; // Stop the player from shooting
+            tankHealth = 100; // Reset the player tank's health
+            gameOver = true; // Set the game over flag to true
+
             return;
         }
 
@@ -367,26 +389,42 @@ function adjustBullet(bullet, obstacles) {
 }
 
 // Render the game
-function render() {
+function render(tickDeltaRender) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawShots();
-    drawObstacles();
+    drawShots(tickDeltaRender);
     drawTank();
+    drawObstacles();
     drawHealthBar();
 }
 centerTank();
 
+let level = 1;
 // The game loop
 function gameLoop() {
-    updateTank();
-    render();
+    let now = Date.now();
+    let tickDelta = now - lastTick;
+    lastTick = now;
+    updateTank(tickDelta);
+    render(tickDelta);
 
     requestAnimationFrame(gameLoop);
-    setTimeout(function() {
+    setTimeout(function () {
         updateOtherTanks();
     }, 3000);
 
-    if(otherTanks.length === 0) {
+    if (otherTanks.length === 0) {
+        if (backgroundMusic.muted === false) {
+            let nextLevelAudio = new Audio("assets/sounds/nextLevelSound.wav");
+            nextLevelAudio.play();
+        }
+
+        if (level % 1 === 0) {
+            difficulty += 0.0002;
+            console.log(difficulty);
+        }
+
+        level++;
+        levelLabel.textContent = `Level: ${level}`;
         minAmountTanks++;
         maxAmountTanks++;
         generateKiTanks();
@@ -400,35 +438,83 @@ function resetGame() {
     bullets = []; // Clear the bullets array
     otherTanks = []; // Clear the other tanks array
     tankHealth = 100; // Reset the tank health
+    let level = 1;
+    levelLabel.textContent = `Level: ${level}`;
+    minAmountTanks = 1;
+    maxAmountTanks = 2;
     generateObstacles(); // Generate new obstacles
     generateKiTanks();
     centerTank(); // Center the tank
     shootPermission = false;
-    setTimeout(function() {
+    setTimeout(function () {
         shootPermission = true;
     }, 3000);
 }
+
+let lastShot = Date.now();
+let difficulty = 0.0065;
+
+const easyBtn = document.getElementById("easy-btn");
+const mediumBtn = document.getElementById("medium-btn");
+const hardBtn = document.getElementById("hard-btn");
+
+// Add event listeners to the buttons
+easyBtn.addEventListener("click", function () {
+    updateActiveButton(easyBtn);
+    difficulty = 0.0058;
+    console.log(difficulty);
+});
+
+mediumBtn.addEventListener("click", function () {
+    updateActiveButton(mediumBtn);
+    difficulty = 0.0065;
+    console.log(difficulty);
+});
+
+hardBtn.addEventListener("click", function () {
+    updateActiveButton(hardBtn);
+    difficulty = 0.0080;
+    console.log(difficulty);
+});
+
+// Function to update the active button
+function updateActiveButton(clickedButton) {
+    // Remove the "active" class from all buttons
+    easyBtn.classList.remove("active");
+    mediumBtn.classList.remove("active");
+    hardBtn.classList.remove("active");
+
+    // Add the "active" class to the clicked button
+    clickedButton.classList.add("active");
+}
+
+console.log(difficulty);
 
 function updateOtherTanks() {
     for (let i = 0; i < otherTanks.length; i++) {
         let tank = otherTanks[i];
 
         // Randomly shoot at the player tank
-        if (Math.random() < 0.002 && shootPermission === true) {
+        if (Math.random() < difficulty && shootPermission === true && lastShot + 1000 < Date.now()) {
+            lastShot = Date.now();
+            console.log(difficulty);
             const dx = x - tank.x;
             const dy = y - tank.y;
             const angle = Math.atan2(dy, dx);
+            tank.angle = angle;
             let newShot = {
-                x: tank.x + Math.cos(angle) * (tank.width / 2 + 10),
-                y: tank.y + Math.sin(angle) * (tank.height / 2 + 10),
+                x: tank.x + Math.cos(angle) * (tank.width / 2 + 20),
+                y: tank.y + Math.sin(angle) * (tank.height / 2 + 20),
                 dx: Math.cos(angle) * speedFactor,
                 dy: Math.sin(angle) * speedFactor,
                 radius: 5,
                 angle: angle,
                 fired: false
-
-
             };
+            if (backgroundMusic.muted === false) {
+                let tankAudio = new Audio('./assets/sounds/shotSound.mp3');
+                tankAudio.play();
+            }
             shots.push(newShot);
         }
     }

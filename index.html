@@ -42,18 +42,18 @@
         <div class="controls">
             <h2>Change the Color of your Tank</h2>
 
-                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_red.png')">
-                    <img class="footer-image" src="assets/images/tank_red.png" alt="TankInRed">
-                </button>
-                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_purple.png')">
-                    <img class="footer-image" src="assets/images/tank_purple.png" alt="TankInPurple">
-                </button>
-                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_pink.png')">
-                    <img class="footer-image" src="assets/images/tank_pink.png" alt="TankInPink">
-                </button>
-                <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_orange.png')">
-                    <img class="footer-image" src="assets/images/tank_orange.png" alt="TankInOrange">
-                </button>
+            <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_red.png')">
+                <img class="footer-image" src="assets/images/tank_red.png" alt="TankInRed">
+            </button>
+            <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_purple.png')">
+                <img class="footer-image" src="assets/images/tank_purple.png" alt="TankInPurple">
+            </button>
+            <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_pink.png')">
+                <img class="footer-image" src="assets/images/tank_pink.png" alt="TankInPink">
+            </button>
+            <button class="footer-button" type="button" onclick="changeTankImage('assets/images/tank_orange.png')">
+                <img class="footer-image" src="assets/images/tank_orange.png" alt="TankInOrange">
+            </button>
 
 
             <img id="tank-image" class="tank-image" src="assets/images/tank_red.png" alt="TankInRed">
@@ -66,22 +66,28 @@
     <div class="popup-content">
         <div class="controls">
             <h2>Game Mode</h2>
-                <div>
-                    <button id="singlePlayer-button"><img class="footer-image" src="assets/images/tank_transparent.png" alt="singlePlayerButton"></button>
-                    <button id="multiPlayer-button"><img class="footer-image" src="assets/images/tank_transparent.png" alt="Exit"><img class="footer-image" src="assets/images/tank_transparent.png" alt="Exit"></button>
-                </div>
+            <div>
+                <button id="easy-btn" class="dButton">Easy</button>
+                <button id="medium-btn" class="dButton active">Medium</button>
+                <button id="hard-btn" class="dButton">Hard</button>
+            </div>
         </div>
     </div>
+</div>
+
+<div id="game-over-popup">
+    <h2>Game Over</h2>
 </div>
 
 <footer>
     <div class="footer">
         <button class="footer-button exit-button" id="exit-button"><img class="footer-image" src="assets/images/exit.png" alt="Exit"></button>
-        <button class="footer-button" id="settings-button"><img class="footer-image" src="assets/images/settings.png" alt="Settings"></button> 
+        <button class="footer-button" id="settings-button"><img class="footer-image" src="assets/images/settings.png" alt="Settings"></button>
         <button class="footer-button reload-button" id="reload-button"><img class="footer-image" src="assets/images/reload.png" alt="Reload"></button>
         <button class="footer-button" id="sound-button"><img class="footer-image" src="assets/images/sound-off.png" alt="Sound"></button>
         <button class="footer-button" id="credit-button"><img class="footer-image" src="assets/images/credit.png" alt="Credit"></button>
         <button class="footer-button" id="colorChange-button"><img class="footer-image" src="assets/images/tank_transparent.png" alt="ColorChange"></button>
+        <p class="level-footer" id="level-footer">Level: 1</p>
     </div>
 </footer>
 

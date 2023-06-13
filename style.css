@@ -111,8 +111,28 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(237, 148, 97, 0.54);
+  background: rgba(94, 79, 66, 0.85);
+  opacity: 70;
   padding: 10px;
+}
+
+.dButton {
+  background-color: #b69c54;
+  border: none;
+  color: black;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: black;
+  font-weight: bold;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.active {
+  background-color: #bec0c0;
 }
 
 .footer-button {
@@ -128,6 +148,17 @@ canvas {
 }
 .footer-button:hover {
   transform: scale(1.1);
+}
+
+.level-footer {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(237, 148, 97, 0.54);
+  padding: 10px;
+  border: black 1px solid;
+  border-radius: 4px;
+  margin-left: 50px;
 }
 
 .exit-button {
@@ -189,6 +220,23 @@ canvas {
   100% {
     background-color: #7f9142;
   }
+}
+#game-over-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: none; /* Initially hidden */
+  justify-content: center;
+  align-items: center;
+}
+
+#game-over-popup h2 {
+  font-size: 24px;
+  color: white;
+  text-align: center;
 }
 
 /*# sourceMappingURL=style.css.map */
