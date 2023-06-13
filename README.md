@@ -10,6 +10,12 @@ To play the game, simply clone the repository and open the `index.html` file in 
 git clone https://github.com/Kryschtzyk/TankGameFHDW.git
 ```
 
+## Version and latest feature
+
+## Known Bugs
+
+## Broweser Compatibility
+
 ## Usage
 
 ### Singleplayer
