@@ -7,6 +7,7 @@ const singlePlayerMode = document.getElementById("singlePlayer-button");
 const multiPlayerMode = document.getElementById("multiPlayer-button");
 
 const levelLabel = document.getElementById("level-footer");
+let shotAudio = new Audio('./assets/sounds/shotSound.mp3');
 
 // Tank image
 let tankImage = new Image();
@@ -14,7 +15,8 @@ tankImage.src = document.getElementById("tank-image").src;
 
 let obstacleImage = new Image();
 obstacleImage.src = "./assets/images/stoneTexture.png";
-body.style.backgroundImage = "url('./assets/images/backgroundTexture.jpg')";
+body.style.backgroundImage = "url('./assets/images/backgroundTexture.png')";
+
 
 // Generate obstacles
 let obstacles = [];
@@ -220,6 +222,10 @@ function updateTank(tickDelta) {
         const currentTime = Date.now();
         if (currentTime - lastShotTime > 500) {
             lastShotTime = currentTime;
+            console.log(backgroundMusic.muted);
+            if (backgroundMusic.muted === false) {
+                shotAudio.play();
+            }
 
             let newShot = {
                 x: x + Math.cos(angle) * (tankImage.width / 2 + 10),
@@ -344,9 +350,13 @@ function adjustBullet(bullet, obstacles) {
         // Decrease the health of the player tank when hit
         tankHealth -= 25;
         if (tankHealth <= 0) {
+            if (backgroundMusic.muted === false) {
+                let gameOverMusic = new Audio("assets/sounds/game-over.wav");
+                gameOverMusic.play();
+            }
             const gameOverPopup = document.getElementById("game-over-popup");
             gameOverPopup.style.display = "flex"; // Show the game over popup
-
+            level = 1; // Reset the level
             shootPermission = false; // Stop the player from shooting
             tankHealth = 100; // Reset the player tank's health
             gameOver = true; // Set the game over flag to true
@@ -398,11 +408,21 @@ function gameLoop() {
     render(tickDelta);
 
     requestAnimationFrame(gameLoop);
-    setTimeout(function() {
+    setTimeout(function () {
         updateOtherTanks();
     }, 3000);
 
-    if(otherTanks.length === 0) {
+    if (otherTanks.length === 0) {
+        if (backgroundMusic.muted === false) {
+            let nextLevelAudio = new Audio("assets/sounds/nextLevelSound.wav");
+            nextLevelAudio.play();
+        }
+
+        if (level % 1 === 0) {
+            difficulty += 0.0002;
+            console.log(difficulty);
+        }
+
         level++;
         levelLabel.textContent = `Level: ${level}`;
         minAmountTanks++;
@@ -426,17 +446,58 @@ function resetGame() {
     generateKiTanks();
     centerTank(); // Center the tank
     shootPermission = false;
-    setTimeout(function() {
+    setTimeout(function () {
         shootPermission = true;
     }, 3000);
 }
+
+let lastShot = Date.now();
+let difficulty = 0.0065;
+
+const easyBtn = document.getElementById("easy-btn");
+const mediumBtn = document.getElementById("medium-btn");
+const hardBtn = document.getElementById("hard-btn");
+
+// Add event listeners to the buttons
+easyBtn.addEventListener("click", function () {
+    updateActiveButton(easyBtn);
+    difficulty = 0.0058;
+    console.log(difficulty);
+});
+
+mediumBtn.addEventListener("click", function () {
+    updateActiveButton(mediumBtn);
+    difficulty = 0.0065;
+    console.log(difficulty);
+});
+
+hardBtn.addEventListener("click", function () {
+    updateActiveButton(hardBtn);
+    difficulty = 0.0080;
+    console.log(difficulty);
+});
+
+// Function to update the active button
+function updateActiveButton(clickedButton) {
+    // Remove the "active" class from all buttons
+    easyBtn.classList.remove("active");
+    mediumBtn.classList.remove("active");
+    hardBtn.classList.remove("active");
+
+    // Add the "active" class to the clicked button
+    clickedButton.classList.add("active");
+}
+
+console.log(difficulty);
 
 function updateOtherTanks() {
     for (let i = 0; i < otherTanks.length; i++) {
         let tank = otherTanks[i];
 
         // Randomly shoot at the player tank
-        if (Math.random() < 0.002 && shootPermission === true) {
+        if (Math.random() < difficulty && shootPermission === true && lastShot + 1000 < Date.now()) {
+            lastShot = Date.now();
+            console.log(difficulty);
             const dx = x - tank.x;
             const dy = y - tank.y;
             const angle = Math.atan2(dy, dx);
@@ -450,6 +511,10 @@ function updateOtherTanks() {
                 angle: angle,
                 fired: false
             };
+            if (backgroundMusic.muted === false) {
+                let tankAudio = new Audio('./assets/sounds/shotSound.mp3');
+                tankAudio.play();
+            }
             shots.push(newShot);
         }
     }

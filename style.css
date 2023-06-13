@@ -111,8 +111,28 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(237, 148, 97, 0.54);
+  background: rgba(94, 79, 66, 0.85);
+  opacity: 70;
   padding: 10px;
+}
+
+.dButton {
+  background-color: #b69c54;
+  border: none;
+  color: black;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: black;
+  font-weight: bold;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.active {
+  background-color: #bec0c0;
 }
 
 .footer-button {
