@@ -1,6 +1,7 @@
 // Get the canvas and context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 
 const singlePlayerMode = document.getElementById("singlePlayer-button");
 const multiPlayerMode = document.getElementById("multiPlayer-button");
@@ -10,6 +11,10 @@ const levelLabel = document.getElementById("level-footer");
 // Tank image
 let tankImage = new Image();
 tankImage.src = document.getElementById("tank-image").src;
+
+let obstacleImage = new Image();
+obstacleImage.src = "./assets/images/stoneTexture.png";
+body.style.backgroundImage = "url('./assets/images/backgroundTexture.jpg')";
 
 // Generate obstacles
 let obstacles = [];
@@ -25,6 +30,7 @@ let gameOver = false;
 
 let lastResizeTime = 0;
 const resizeCooldown = 2000; // 2 seconds
+let lastTick = Date.now();
 
 // Resize the canvas to fit the window
 function resizeCanvas() {
@@ -137,7 +143,7 @@ function drawObstacles() {
     for (let i = 0; i < obstacles.length; i++) {
         let obstacle = obstacles[i];
         ctx.beginPath();
-        ctx.rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.drawImage(obstacleImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         ctx.fillStyle = 'gray';
         ctx.fill();
         ctx.closePath();
@@ -151,13 +157,13 @@ function drawObstacles() {
 }
 
 // Draw shots
-function drawShots() {
+function drawShots(tickDeltaShots) {
     for (let i = 0; i < shots.length; i++) {
         let shot = shots[i];
 
         if (!shot.fired) {
-            shot.dx = Math.cos(shot.angle) * speedFactor;
-            shot.dy = Math.sin(shot.angle) * speedFactor;
+            shot.dx = Math.cos(shot.angle) * speedFactor * tickDeltaShots * 0.25;
+            shot.dy = Math.sin(shot.angle) * speedFactor * tickDeltaShots * 0.25;
             shot.fired = true;
         }
 
@@ -172,7 +178,7 @@ function drawShots() {
 
         ctx.beginPath();
         ctx.arc(shot.x, shot.y, shot.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = 'black';
         ctx.fill();
         ctx.closePath();
 
@@ -181,16 +187,16 @@ function drawShots() {
 }
 
 // Update tank position and angle based on keyboard input
-function updateTank() {
-    let rotationSpeed = 0.0055;
-    let moveSpeed = 0.5;
+function updateTank(tickDelta) {
+    let rotationSpeed = 0.0055 * tickDelta * 0.25;
+    let moveSpeed = 0.5 * tickDelta * 0.25;
     let dx = 0;
     let dy = 0;
     let dAngle = 0;
 
-    if (keys[16] && minAmountTanks >= 5) {
-        rotationSpeed = 0.01;
-        moveSpeed = 0.75;
+    if (keys[16] && minAmountTanks >= 1) {
+        rotationSpeed += 0.01;
+        moveSpeed += 0.5;
     }
 
     if (keys[87]) { // W key
@@ -373,11 +379,11 @@ function adjustBullet(bullet, obstacles) {
 }
 
 // Render the game
-function render() {
+function render(tickDeltaRender) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawShots();
-    drawObstacles();
+    drawShots(tickDeltaRender);
     drawTank();
+    drawObstacles();
     drawHealthBar();
 }
 centerTank();
@@ -385,8 +391,11 @@ centerTank();
 let level = 1;
 // The game loop
 function gameLoop() {
-    updateTank();
-    render();
+    let now = Date.now();
+    let tickDelta = now - lastTick;
+    lastTick = now;
+    updateTank(tickDelta);
+    render(tickDelta);
 
     requestAnimationFrame(gameLoop);
     setTimeout(function() {
@@ -431,6 +440,7 @@ function updateOtherTanks() {
             const dx = x - tank.x;
             const dy = y - tank.y;
             const angle = Math.atan2(dy, dx);
+            tank.angle = angle;
             let newShot = {
                 x: tank.x + Math.cos(angle) * (tank.width / 2 + 20),
                 y: tank.y + Math.sin(angle) * (tank.height / 2 + 20),
