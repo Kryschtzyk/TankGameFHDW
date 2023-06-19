@@ -1,6 +1,6 @@
 # Tank Game by Olli's Server Schmiede Inc.
 
-This is a web-based game developed as a project for FHDW Bergisch Gladbach. The game is built using HTML, CSS, and JavaScript and is a Tank Game that offers single-player mode. The single-player mode features unlimited levels that the player can progress through. In addition, the user can alter his tank color and work on his high score.
+This is a web-based game developed as a project for FHDW Bergisch Gladbach (module name: Web Technologies and Applications). The game is built using HTML, CSS, and JavaScript and is a Tank Game that offers single-player mode. The single-player mode features unlimited levels that the player can progress through. In addition, the user can alter his tank color and work on his high score.
 
 ## Installation
 
@@ -50,8 +50,9 @@ The info button displays the user controls.
 ## Credits
 
 The Tank Game was developed by Jan Simons and Oliwer Krzyszczyk from the FHDW University in Bergisch Gladbach. 
+If not listed next, other creative content is licensed under our MIT license.
 
-### Music license
+### Backround Music license
 
 CC0 License
 Some of the Content made available for download on the Service is subject to and licensed under the Creative Commons Zero (CC0) license ("CC0 Content"). CC0 Content on the Service is any content which lists a "Published date" prior to January 9, 2019. This means that to the greatest extent permitted by applicable law, the authors of that work have dedicated the work to the public domain by waiving all of his or her rights to the CC0 Content worldwide under copyright law, including all related and neighboring rights. Subject to the CC0 License Terms, the CC0 Content can be used for all personal and commercial purposes without attributing the author/ content owner of the CC0 Content or Pixabay.
