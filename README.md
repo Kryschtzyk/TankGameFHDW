@@ -1,4 +1,4 @@
-# Tank Game
+# Tank Game by Olli's Server Schmiede Inc.
 
 This is a web-based game developed as a project for FHDW Bergisch Gladbach. The game is built using HTML, CSS, and JavaScript and is a Tank Game that offers single-player mode. The single-player mode features unlimited levels that the player can progress through. In addition, the user can alter his tank color and work on his high score.
 
