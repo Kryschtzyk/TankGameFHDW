@@ -179,6 +179,17 @@ canvas {
   margin-left: 50px;
 }
 
+#score-footer{
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(237, 148, 97, 0.54);
+  padding: 10px;
+  border: black 1px solid;
+  border-radius: 4px;
+  margin-left: 50px;
+}
+
 .exit-button {
   display: none;
 }

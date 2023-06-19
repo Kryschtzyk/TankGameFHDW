@@ -7,7 +7,7 @@ const singlePlayerMode = document.getElementById("singlePlayer-button");
 const multiPlayerMode = document.getElementById("multiPlayer-button");
 
 const levelLabel = document.getElementById("level-footer");
-let shotAudio = new Audio('./assets/sounds/shotSound.mp3');
+let shotAudio = new Audio('./assets/sounds/shotSound.mp3')  ;
 
 // Tank image
 let tankImage = new Image();
@@ -356,6 +356,8 @@ function adjustBullet(bullet, obstacles) {
             }
             const gameOverPopup = document.getElementById("game-over-popup");
             gameOverPopup.style.display = "flex"; // Show the game over popup
+            setCookie("highscore", level, 7);
+            scoreLabel.innerHTML = scoreLabel.innerText = "Highscore: " + getCookie("highscore");
             level = 1; // Reset the level
             shootPermission = false; // Stop the player from shooting
             tankHealth = 100; // Reset the player tank's health
@@ -528,3 +530,13 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keyup', (event) => {
     keys[event.keyCode] = false;
 });
+
+function setCookie(name, value, days){
+    var expires = "";
+    if (days){
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires="+ date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}

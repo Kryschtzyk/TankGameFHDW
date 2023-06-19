@@ -14,12 +14,32 @@ const soundButton = document.getElementById("sound-button");
 const backgroundMusic = document.getElementById("background-music");
 const audioState = document.getElementById('background-audio');
 const footer = document.getElementsByClassName("footer");
+const scoreLabel = document.getElementById("score-footer");
 
 const buttonClickSound = new Audio('assets/sounds/buttonSound.mp3');
 const buttons = document.querySelectorAll("button");
 
 const audio = new Audio("assets/sounds/startMenueMusic.mp3");
 let audioPlaying = false;
+
+function getCookie(cookieNameSaved) {
+    var cookieName = cookieNameSaved + "=";
+    var cookieArray = document.cookie.split(";");
+    for (var i = 0; i < cookieArray.length; i++) {
+        var cookie = cookieArray[i];
+        while (cookie.charAt(0) === " ") {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(cookieName) === 0) {
+            return cookie.substring(cookieName.length, cookie.length);
+        }
+    }
+    return 0;
+}
+
+
+let highscore = getCookie("highscore");
+scoreLabel.innerText = "Highscore: " + highscore;
 
 audio.addEventListener("ended", () => {
     audio.currentTime = 0; // Reset the audio playback position to the beginning
@@ -50,6 +70,7 @@ startButton.addEventListener("click", function () {
     reloadButton.style.display = "block";
     settingsButton.style.display = "none";
     levelLabel.style.display = "block";
+    scoreLabel.style.display = "none";
     colorChangeButton.style.display = "none";
 
     // Resize the canvas and generate obstacles
