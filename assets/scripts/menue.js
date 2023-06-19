@@ -89,6 +89,13 @@ exitButton.addEventListener("click", function () {
     location.reload();
 })
 
+document.addEventListener("keydown", function(event) {
+    if (event.keyCode === 27) { // Check if Escape key is pressed
+        location.reload(); // Reload the page
+    }
+});
+
+
 creditButton.addEventListener("click", () => {
     popup.style.display = "flex";
     body.classList.add("blur");

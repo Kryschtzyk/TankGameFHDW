@@ -216,7 +216,7 @@ function updateTank(tickDelta) {
         dAngle += rotationSpeed;
     }
 
-    if (keys[81] && !isShooting && !gameOver) { // Q key
+    if (keys[32] && !isShooting && !gameOver) { // Space key
         isShooting = true;
 
         const currentTime = Date.now();
